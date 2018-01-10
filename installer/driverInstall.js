@@ -388,10 +388,11 @@ var install_node_ibm_db = function(file_url) {
 
                 if(platform == 'darwin' && arch == 'x64') {
                     // Run the install_name_tool
-                    var nameToolCommand = IS_ENVIRONMENT_VAR ?
-                        "install_name_tool -change libdb2.dylib \"$IBM_DB_HOME/lib/libdb2.dylib\" ./build/Release/odbc_bindings.node" :
-                        "install_name_tool -change libdb2.dylib @loader_path/../../installer/clidriver/lib/libdb2.dylib ./build/Release/odbc_bindings.node" ;
-                    var nameToolCmdProcess = exec(nameToolCommand , 
+                    // Use relative path if binary was downloaded, absolute path if $IBM_DB_HOME was defined through env var
+                    var nameToolCommand = isDownloaded ?
+                      "install_name_tool -change libdb2.dylib @loader_path/../../installer/clidriver/lib/libdb2.dylib ./build/Release/odbc_bindings.node" :
+                      "install_name_tool -change libdb2.dylib \"$IBM_DB_HOME/lib/libdb2.dylib\" ./build/Release/odbc_bindings.node";
+                    var nameToolCmdProcess = exec(nameToolCommand ,
                     function (error1, stdout1, stderr1) {
                         if (error1 !== null) {
                             console.log('Error setting up the lib path to ' +
